@@ -7,6 +7,13 @@ factory.define('User', User, {
   name: faker.name.findName(),
   email: faker.internet.email(),
   password: faker.internet.password(),
+  cpf: '123.123.123.09',
+  provider: true,
+});
+
+factory.define('Session', User, {
+  email: faker.internet.email(),
+  password: faker.internet.password(),
 });
 
 export default factory;

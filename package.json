@@ -6,9 +6,9 @@
   "scripts": {
     "dev": "nodemon src/server.js",
     "build": "sucrase ./src -d ./dist --transforms imports",
-    "pretest": "set NODE_ENV=test sequelize db:migrate",
-    "test": "jest",
-    "posttest": "set NODE_ENV=test sequelize db:migrate:undo:all"
+    "pretest": "NODE_ENV=test sequelize db:migrate",
+    "test": "NODE_ENV=test jest",
+    "posttest": "NODE_ENV=test sequelize db:migrate:undo:all"
   },
   "dependencies": {
     "axios": "^0.19.0",

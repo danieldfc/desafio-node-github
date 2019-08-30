@@ -1,5 +1,5 @@
-import dotenv from 'dotenv';
+const dotenv = require('dotenv');
 
 dotenv.config({
-  path: process.env.DB_DIALECT === 'test' ? '.env.test' : '.env',
+  path: process.env.NODE_ENV === 'test' ? '.env.test' : '.env',
 });
