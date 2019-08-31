@@ -48,7 +48,7 @@ class GithubController {
         }
       );
 
-      const recived = await Github.findAll({
+      const received = await Github.findAll({
         attributes: ['id', 'login', 'bio', 'user_id', 'tags'],
         order: [['login', 'ASC']],
         include: [
@@ -60,7 +60,7 @@ class GithubController {
         ],
       });
 
-      return res.json(recived);
+      return res.json(received);
     } catch (err) {
       return res.status(400).json({ error: `${err}` });
     }
@@ -95,7 +95,7 @@ class GithubController {
 
     await github.update(req.body);
 
-    const recived = await Github.findAll({
+    const received = await Github.findAll({
       attributes: ['id', 'login', 'bio', 'user_id', 'tags'],
       include: [
         {
@@ -106,7 +106,7 @@ class GithubController {
       ],
     });
 
-    return res.json(recived);
+    return res.json(received);
   }
 
   async delete(req, res) {
