@@ -9,38 +9,23 @@ describe('Session', () => {
     await truncate();
   });
 
-  it('should be abled to access private router with authenticated', async () => {
-    const user = await factory.create('User', {
-      password: '123123',
-    });
-
-    const response = await request(app)
-      .get('/dashboard')
-      .set('Authorization', `Bearer ${user.generateToken()}`);
-
-    expect(response.status).toBe(200);
-  });
-
   it('should not be abled to access private router with jwt invalid', async () => {
     const response = await request(app)
-      .post('/dashboard')
-      .set('Authorization', 'Bearer 123123');
+      .get('/users')
+      .set('Authorization', 'Bearer 1234')
+      .send({ provider: true });
 
     expect(response.status).toBe(401);
   });
 
   it('should not be abled to access private router with jwt not found', async () => {
-    const response = await request(app).post('/dashboard');
+    const response = await request(app).get('/users');
 
     expect(response.status).toBe(401);
   });
 
   it('should be able to session', async () => {
-    const user = await factory.create('User', {
-      cpf: '123.123.123-09',
-      password: '123456',
-      provider: true,
-    });
+    const user = await factory.create('User');
 
     const response = await request(app)
       .post('/sessions')

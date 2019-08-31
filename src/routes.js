@@ -1,6 +1,7 @@
 import { Router } from 'express';
 
 import UserController from './app/controllers/UserController';
+import ProviderController from './app/controllers/ProviderController';
 import SessionController from './app/controllers/SessionController';
 
 import authMiddleware from './app/middlewares/auth';
@@ -12,10 +13,8 @@ routes.post('/sessions', SessionController.store);
 
 routes.use(authMiddleware);
 
-routes.get('/dashboard', authMiddleware, (req, res) => {
-  return res.status(200).send();
-});
+routes.get('/users/:name', ProviderController.show);
 
-// routes.put('/users/:id', UserController.update);
+routes.put('/users/:id', UserController.update);
 
 export default routes;
