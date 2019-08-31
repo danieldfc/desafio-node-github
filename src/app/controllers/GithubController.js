@@ -3,6 +3,8 @@ import api from '../../services/api';
 import User from '../models/User';
 import Github from '../models/Github';
 
+import DeleteGithubServices from '../services/DeleteGithubServices';
+
 class GithubController {
   async store(req, res) {
     try {
@@ -96,42 +98,12 @@ class GithubController {
   }
 
   async delete(req, res) {
-    const isProvider = await User.findOne({
-      where: {
-        id: req.userId,
-        provider: true,
-      },
+    const received = await DeleteGithubServices.run({
+      provider_id: req.params.id,
+      user_id: req.userId,
     });
 
-    if (!isProvider) {
-      return res.status(401).json({ error: 'User is not provider.' });
-    }
-
-    const github = await Github.findOne({
-      where: {
-        id: req.params.id,
-        user_id: req.userId,
-      },
-    });
-
-    if (!github) {
-      return res.status(400).json({ error: 'Github not found' });
-    }
-
-    await github.destroy();
-
-    const recived = await Github.findAll({
-      attributes: ['id', 'name', 'login', 'bio', 'user_id', 'tags'],
-      include: [
-        {
-          model: User,
-          as: 'user',
-          attributes: ['id', 'name', 'email'],
-        },
-      ],
-    });
-
-    return res.json(recived);
+    return res.json(received);
   }
 }
 
