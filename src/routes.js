@@ -21,5 +21,6 @@ routes.put('/users/:id', UserController.update);
 
 routes.post('/github', GithubController.store);
 routes.put('/github', GithubController.update);
+routes.delete('/github/:id', GithubController.delete);
 
 export default routes;

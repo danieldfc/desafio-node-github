@@ -28,7 +28,7 @@ class GithubController {
         return res.status(400).json({ error: 'Dev not found' });
       }
 
-      const { locale, name, bio, html_url, user_id } = await Github.create(
+      await Github.create(
         {
           login,
           locale: response.data.location,
@@ -48,14 +48,19 @@ class GithubController {
         }
       );
 
-      return res.json({
-        login,
-        locale,
-        name,
-        bio,
-        html_url,
-        user_id,
+      const recived = await Github.findAll({
+        attributes: ['id', 'login', 'bio', 'user_id', 'tags'],
+        order: [['login', 'ASC']],
+        include: [
+          {
+            model: User,
+            as: 'user',
+            attributes: ['id', 'name', 'email'],
+          },
+        ],
       });
+
+      return res.json(recived);
     } catch (err) {
       return res.status(400).json({ error: `${err}` });
     }
@@ -74,7 +79,7 @@ class GithubController {
       return res.status(400).json({ error: "Date isn't avalible." });
     }
 
-    const { login, tags } = req.body;
+    const { login } = req.body;
 
     const user = await User.findByPk(req.userId);
 
@@ -88,17 +93,59 @@ class GithubController {
       return res.status(400).json({ error: 'Dev not found.' });
     }
 
-    const { id, bio, locale, html_url } = await github.update(req.body);
+    await github.update(req.body);
 
-    return res.json({
-      github: {
-        id,
-        bio,
-        locale,
-        html_url,
-        tags,
+    const recived = await Github.findAll({
+      attributes: ['id', 'login', 'bio', 'user_id', 'tags'],
+      include: [
+        {
+          model: User,
+          as: 'user',
+          attributes: ['id', 'name', 'email'],
+        },
+      ],
+    });
+
+    return res.json(recived);
+  }
+
+  async delete(req, res) {
+    const isProvider = await User.findOne({
+      where: {
+        id: req.userId,
+        provider: true,
       },
     });
+
+    if (!isProvider) {
+      return res.status(401).json({ error: 'User is not provider.' });
+    }
+
+    const github = await Github.findOne({
+      where: {
+        id: req.params.id,
+        user_id: req.userId,
+      },
+    });
+
+    if (!github) {
+      return res.status(400).json({ error: 'Github not found' });
+    }
+
+    await github.destroy();
+
+    const recived = await Github.findAll({
+      attributes: ['id', 'login', 'bio', 'user_id', 'tags'],
+      include: [
+        {
+          model: User,
+          as: 'user',
+          attributes: ['id', 'name', 'email'],
+        },
+      ],
+    });
+
+    return res.json(recived);
   }
 }
 
