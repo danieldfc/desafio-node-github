@@ -1,5 +1,3 @@
-import * as Yup from 'yup';
-
 import User from '../models/User';
 import Github from '../models/Github';
 
@@ -18,14 +16,6 @@ class ProviderController {
 
   async show(req, res) {
     try {
-      const schema = Yup.object().shape({
-        name: Yup.string,
-      });
-
-      if (!(await schema.isValid())) {
-        return res.status(401).json({ error: 'Validation invalid' });
-      }
-
       const { name } = req.params;
 
       const user = await User.findByPk(req.userId);

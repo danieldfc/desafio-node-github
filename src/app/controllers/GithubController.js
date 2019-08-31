@@ -1,14 +1,12 @@
-import * as Yup from 'yup';
+import api from '../../services/api';
 
 import User from '../models/User';
-
-import api from '../../services/api';
 import Github from '../models/Github';
 
 class GithubController {
   async store(req, res) {
     try {
-      const { login } = req.body;
+      const { login, name } = req.body;
 
       const user = await User.findByPk(req.userId);
 
@@ -30,9 +28,9 @@ class GithubController {
 
       await Github.create(
         {
+          name,
           login,
           locale: response.data.location,
-          name: response.data.name,
           bio: response.data.bio,
           html_url: response.data.html_url,
           user_id: req.userId,
@@ -49,7 +47,7 @@ class GithubController {
       );
 
       const received = await Github.findAll({
-        attributes: ['id', 'login', 'bio', 'user_id', 'tags'],
+        attributes: ['id', 'name', 'login', 'bio', 'user_id', 'tags'],
         order: [['login', 'ASC']],
         include: [
           {
@@ -67,18 +65,6 @@ class GithubController {
   }
 
   async update(req, res) {
-    const schema = Yup.object().shape({
-      login: Yup.string(),
-      locale: Yup.string(),
-      bio: Yup.string(),
-      html_url: Yup.string(),
-      user_id: Yup.number(),
-    });
-
-    if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: "Date isn't avalible." });
-    }
-
     const { login } = req.body;
 
     const user = await User.findByPk(req.userId);
@@ -96,7 +82,7 @@ class GithubController {
     await github.update(req.body);
 
     const received = await Github.findAll({
-      attributes: ['id', 'login', 'bio', 'user_id', 'tags'],
+      attributes: ['id', 'name', 'login', 'bio', 'user_id', 'tags'],
       include: [
         {
           model: User,
@@ -135,7 +121,7 @@ class GithubController {
     await github.destroy();
 
     const recived = await Github.findAll({
-      attributes: ['id', 'login', 'bio', 'user_id', 'tags'],
+      attributes: ['id', 'name', 'login', 'bio', 'user_id', 'tags'],
       include: [
         {
           model: User,

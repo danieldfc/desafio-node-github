@@ -4,6 +4,7 @@ class Github extends Model {
   static init(sequelize) {
     super.init(
       {
+        name: Sequelize.STRING,
         login: Sequelize.STRING,
         bio: Sequelize.STRING,
         locale: Sequelize.STRING,
