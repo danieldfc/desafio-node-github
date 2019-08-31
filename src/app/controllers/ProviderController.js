@@ -1,50 +1,58 @@
 import * as Yup from 'yup';
 
-import api from '../../services/api';
-
 import User from '../models/User';
+import Github from '../models/Github';
 
 class ProviderController {
   async index(req, res) {
-    const providers = User.findAll({
-      where: { provider: true },
+    const { page = 1 } = req.query;
+    const providers = await User.findAll({
       attributes: ['id', 'name', 'email'],
+      order: [['name', 'ASC']],
+      limit: 10,
+      offset: (page - 1) * 10,
     });
 
     return res.json(providers);
   }
 
   async show(req, res) {
-    const schema = Yup.object().shape({
-      name: Yup.string,
-    });
+    try {
+      const schema = Yup.object().shape({
+        name: Yup.string,
+      });
 
-    if (!(await schema.isValid())) {
-      return res.status(401).json({ error: 'Validation invalid' });
+      if (!(await schema.isValid())) {
+        return res.status(401).json({ error: 'Validation invalid' });
+      }
+
+      const { name } = req.params;
+
+      const user = await User.findByPk(req.userId);
+
+      if (!user.provider) {
+        return res.status(401).json({ error: 'User not provider' });
+      }
+
+      const response = await Github.findOne({
+        where: { login: name },
+      });
+
+      if (!response) {
+        return res.status(400).json({ error: 'Dev not found' });
+      }
+
+      const data = {
+        name: response.login,
+        bio: response.bio,
+        locale: response.locale,
+        html_url: response.html_url,
+      };
+
+      return res.json(data);
+    } catch (err) {
+      return res.status(400).json({ error: `${err}` });
     }
-
-    const { name } = req.params;
-
-    const user = await User.findByPk(req.userId);
-
-    if (!user) {
-      return res.status(400).json({ error: 'User not found' });
-    }
-
-    if (!user.provider) {
-      return res.status(401).json({ error: 'User not provider' });
-    }
-
-    const response = await api.get(`/users/${name}`);
-
-    const data = {
-      id: response.data.id,
-      name: response.data.name,
-      bio: response.data.bio,
-      html_url: response.data.html_url,
-    };
-
-    return res.json(data);
   }
 }
 

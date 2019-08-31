@@ -30,6 +30,7 @@ module.exports = {
         onUpload: 'CASCADE',
         onDelete: 'SET NULL',
       },
+
       created_at: {
         type: Sequelize.STRING,
         allowNull: false,

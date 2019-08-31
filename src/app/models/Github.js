@@ -8,6 +8,7 @@ class Github extends Model {
         bio: Sequelize.STRING,
         locale: Sequelize.STRING,
         html_url: Sequelize.STRING,
+        tags: [Sequelize.STRING],
       },
       { sequelize }
     );
@@ -16,7 +17,7 @@ class Github extends Model {
   }
 
   static associate(models) {
-    this.belongsToMany(models.User, { foreignKey: 'user_id', as: 'user' });
+    this.belongsTo(models.User, { foreignKey: 'user_id', as: 'user' });
   }
 }
 
